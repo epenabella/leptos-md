@@ -1,0 +1,32 @@
+[package]
+name = "leptos-md"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.88"
+description = "A simple, signal-free Markdown renderer for Leptos with Tailwind CSS styling"
+license = "MIT OR Apache-2.0"
+authors = ["Rick Penabella <rick@webpuppi.com>"]
+repository = "https://github.com/epenabella/leptos-md"
+homepage = "https://epenabella.com"
+documentation = "https://docs.rs/leptos-md"
+readme = "README.md"
+keywords = ["leptos", "markdown", "tailwind", "wasm", "ssr"]
+categories = ["web-programming", "wasm", "rendering"]
+exclude = ["target/", "scripts/", ".gitignore"]
+
+[features]
+default = []
+full = ["simd"]
+simd = ["pulldown-cmark/simd"]
+
+[dependencies]
+leptos = { version = "0.8", features = [] }
+pulldown-cmark = { version = "0.13" }
+
+[[example]]
+name = "basic"
+required-features = []
+
+[[example]]
+name = "simple"
+required-features = []

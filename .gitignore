@@ -1,0 +1,19 @@
+# Build artifacts
+/target/
+
+# Cargo.lock is excluded for libraries (consumers resolve their own versions)
+Cargo.lock
+
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Editor backups
+*~
+*.orig
+
