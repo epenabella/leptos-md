@@ -61,14 +61,13 @@ This paragraph contains `inline code`, **bold text**, *italic text*, and ~~strik
 That's all folks!
 "#;
 
-    let options = MarkdownOptions {
-        enable_gfm: true,
-        code_theme: Some(CodeBlockTheme::GitHub),
-        syntax_highlighting_language_classes: true,
-        open_links_in_new_tab: true,
-        allow_raw_html: true,
-        use_explicit_classes: false,
-    };
+    let options = MarkdownOptions::new()
+        .with_gfm(true)
+        .with_code_theme(CodeBlockTheme::GitHub)
+        .with_language_classes(true)
+        .with_new_tab_links(true)
+        .with_allow_raw_html(true)
+        .with_explicit_classes(false);
 
     view! {
         <div class="min-h-screen bg-white dark:bg-gray-900">

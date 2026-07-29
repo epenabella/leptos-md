@@ -1,6 +1,6 @@
 //! # leptos-md
 //!
-//! A simple, signal-free Markdown renderer for [Leptos](https://leptos.dev) with Tailwind CSS styling.
+//! A simple, signal-free Markdown renderer for [Leptos](https://leptos.dev) with Tailwind (or custom) CSS styling.
 //!
 //! ## Quick Start
 //!
@@ -49,14 +49,14 @@ mod components;
 mod renderer;
 
 pub use components::{
-    get_code_theme_classes, get_enhanced_prose_classes, CodeBlockTheme, MarkdownClasses,
-    MarkdownOptions, MarkdownStyles,
+    get_code_theme_classes, get_enhanced_prose_classes, CodeBlockTheme, MDClasses, MarkdownOptions,
+    MarkdownStyles, TailwindMarkdownClasses,
 };
 pub use renderer::MarkdownRenderer;
 
 /// Main component for rendering Markdown content with Tailwind CSS styling
 #[component]
-pub fn Markdown(
+pub fn Markdown<MarkdownClasses: MDClasses>(
     /// The markdown content as a string
     #[prop(into)]
     content: String,
@@ -65,7 +65,7 @@ pub fn Markdown(
     class: Option<String>,
     /// Markdown rendering options
     #[prop(optional)]
-    options: Option<MarkdownOptions>,
+    options: Option<MarkdownOptions<MarkdownClasses>>,
 ) -> impl IntoView {
     let renderer = MarkdownRenderer::new(options.unwrap_or_default());
 
@@ -98,11 +98,11 @@ pub fn Markdown(
 
 /// Utility function to render markdown string directly to AnyView with Tailwind styling
 pub fn render_markdown_string(content: &str) -> Result<AnyView, String> {
-    let renderer = MarkdownRenderer::new(MarkdownOptions::default());
+    let renderer = MarkdownRenderer::new(MarkdownOptions::<TailwindMarkdownClasses>::default());
     renderer.render(content)
 }
 
-/// Utility function to render markdown with custom options and Tailwind styling
+/// Utility function to render markdown with custom options and styling
 pub fn render_markdown_with_options(
     content: &str,
     options: MarkdownOptions,

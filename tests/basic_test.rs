@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
     use leptos_md::{
-        render_markdown_string, render_markdown_with_options, CodeBlockTheme, MarkdownClasses,
-        MarkdownOptions,
+        render_markdown_string, render_markdown_with_options, CodeBlockTheme, MDClasses,
+        MarkdownOptions, TailwindMarkdownClasses,
     };
 
     #[test]
@@ -136,23 +136,23 @@ Term 2
     #[test]
     fn test_tailwind_classes() {
         // Test that classes are defined and contain expected Tailwind utilities
-        assert!(!MarkdownClasses::H1.is_empty());
-        assert!(!MarkdownClasses::CODE_BLOCK.is_empty());
-        assert!(!MarkdownClasses::TABLE.is_empty());
+        assert!(!TailwindMarkdownClasses::H1.is_empty());
+        assert!(!TailwindMarkdownClasses::CODE_BLOCK.is_empty());
+        assert!(!TailwindMarkdownClasses::TABLE.is_empty());
         assert!(
-            MarkdownClasses::H1.contains("text-3xl"),
+            TailwindMarkdownClasses::H1.contains("text-3xl"),
             "H1 should have text-3xl class"
         );
         assert!(
-            MarkdownClasses::BLOCKQUOTE.contains("border-l-4"),
+            TailwindMarkdownClasses::BLOCKQUOTE.contains("border-l-4"),
             "Blockquote should have border-l-4 class"
         );
         assert!(
-            MarkdownClasses::LINK.contains("text-blue"),
+            TailwindMarkdownClasses::LINK.contains("text-blue"),
             "Link should have blue text color"
         );
         assert!(
-            MarkdownClasses::INLINE_CODE.contains("font-mono"),
+            TailwindMarkdownClasses::INLINE_CODE.contains("font-mono"),
             "Inline code should have monospace font"
         );
     }
@@ -161,29 +161,53 @@ Term 2
     fn test_tailwind_classes_new_constants() {
         // Test the new constants added for explicit classes mode
         assert!(
-            MarkdownClasses::EM.contains("italic"),
+            TailwindMarkdownClasses::EM.contains("italic"),
             "EM should have italic class"
         );
         assert!(
-            MarkdownClasses::STRONG.contains("font-bold"),
+            TailwindMarkdownClasses::STRONG.contains("font-bold"),
             "STRONG should have font-bold class"
         );
         assert!(
-            MarkdownClasses::DEL.contains("line-through"),
+            TailwindMarkdownClasses::DEL.contains("line-through"),
             "DEL should have line-through class"
         );
-        assert!(!MarkdownClasses::DL.is_empty(), "DL should be defined");
-        assert!(!MarkdownClasses::DT.is_empty(), "DT should be defined");
-        assert!(!MarkdownClasses::DD.is_empty(), "DD should be defined");
-        assert!(!MarkdownClasses::SUP.is_empty(), "SUP should be defined");
-        assert!(!MarkdownClasses::SUB.is_empty(), "SUB should be defined");
         assert!(
-            !MarkdownClasses::THEAD.is_empty(),
+            !TailwindMarkdownClasses::DL.is_empty(),
+            "DL should be defined"
+        );
+        assert!(
+            !TailwindMarkdownClasses::DT.is_empty(),
+            "DT should be defined"
+        );
+        assert!(
+            !TailwindMarkdownClasses::DD.is_empty(),
+            "DD should be defined"
+        );
+        assert!(
+            !TailwindMarkdownClasses::SUP.is_empty(),
+            "SUP should be defined"
+        );
+        assert!(
+            !TailwindMarkdownClasses::SUB.is_empty(),
+            "SUB should be defined"
+        );
+        assert!(
+            !TailwindMarkdownClasses::THEAD.is_empty(),
             "THEAD should be defined"
         );
-        assert!(!MarkdownClasses::TR.is_empty(), "TR should be defined");
-        assert!(!MarkdownClasses::TD.is_empty(), "TD should be defined");
-        assert!(!MarkdownClasses::TH.is_empty(), "TH should be defined");
+        assert!(
+            !TailwindMarkdownClasses::TR.is_empty(),
+            "TR should be defined"
+        );
+        assert!(
+            !TailwindMarkdownClasses::TD.is_empty(),
+            "TD should be defined"
+        );
+        assert!(
+            !TailwindMarkdownClasses::TH.is_empty(),
+            "TH should be defined"
+        );
     }
 
     #[test]
@@ -191,11 +215,11 @@ Term 2
         // Test that all code themes are distinct
         use leptos_md::get_code_theme_classes;
 
-        let default = get_code_theme_classes(&CodeBlockTheme::Default);
-        let dark = get_code_theme_classes(&CodeBlockTheme::Dark);
-        let light = get_code_theme_classes(&CodeBlockTheme::Light);
-        let github = get_code_theme_classes(&CodeBlockTheme::GitHub);
-        let monokai = get_code_theme_classes(&CodeBlockTheme::Monokai);
+        let default = get_code_theme_classes::<TailwindMarkdownClasses>(&CodeBlockTheme::Default);
+        let dark = get_code_theme_classes::<TailwindMarkdownClasses>(&CodeBlockTheme::Dark);
+        let light = get_code_theme_classes::<TailwindMarkdownClasses>(&CodeBlockTheme::Light);
+        let github = get_code_theme_classes::<TailwindMarkdownClasses>(&CodeBlockTheme::GitHub);
+        let monokai = get_code_theme_classes::<TailwindMarkdownClasses>(&CodeBlockTheme::Monokai);
 
         assert_ne!(default, dark, "Default and Dark themes should differ");
         assert_ne!(light, dark, "Light and Dark themes should differ");

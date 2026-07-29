@@ -1,13 +1,15 @@
-use crate::components::{get_code_theme_classes, MarkdownClasses, MarkdownOptions};
+use crate::components::{
+    get_code_theme_classes, MDClasses, MarkdownOptions, TailwindMarkdownClasses,
+};
 use leptos::prelude::*;
 use pulldown_cmark::{CodeBlockKind, Event, HeadingLevel, Options, Parser, Tag};
 
-pub struct MarkdownRenderer {
-    options: MarkdownOptions,
+pub struct MarkdownRenderer<MarkdownClasses: MDClasses = TailwindMarkdownClasses> {
+    options: MarkdownOptions<MarkdownClasses>,
 }
 
-impl MarkdownRenderer {
-    pub fn new(options: MarkdownOptions) -> Self {
+impl<MarkdownClasses: MDClasses> MarkdownRenderer<MarkdownClasses> {
+    pub fn new(options: MarkdownOptions<MarkdownClasses>) -> Self {
         Self { options }
     }
 
@@ -268,7 +270,7 @@ impl MarkdownRenderer {
                     .options
                     .code_theme
                     .as_ref()
-                    .map(|theme| get_code_theme_classes(theme));
+                    .map(|theme| get_code_theme_classes::<MarkdownClasses>(theme));
 
                 // Base class for <pre>
                 let base_pre_class = if use_explicit {
