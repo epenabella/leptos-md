@@ -1,6 +1,6 @@
 [package]
 name = "leptos-md"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 rust-version = "1.88"
 description = "A simple, signal-free Markdown renderer for Leptos with Tailwind CSS styling"
@@ -22,6 +22,9 @@ simd = ["pulldown-cmark/simd"]
 [dependencies]
 leptos = { version = "0.8", features = [] }
 pulldown-cmark = { version = "0.13" }
+
+[dev-dependencies]
+leptos = { version = "0.8", features = ["ssr"] }
 
 [[example]]
 name = "basic"

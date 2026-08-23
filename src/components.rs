@@ -19,10 +19,7 @@ pub struct MarkdownOptions {
     pub syntax_highlighting_language_classes: bool,
     pub open_links_in_new_tab: bool,
     pub allow_raw_html: bool,
-    /// Use explicit Tailwind utility classes on each element instead of relying on prose.
-    /// When `false` (default), relies on Tailwind's `prose` classes for styling.
-    /// When `true`, applies `MarkdownClasses::*` constants directly to elements.
-    pub use_explicit_classes: bool,
+    pub classes: MarkdownClassMap,
 }
 
 impl Default for MarkdownOptions {
@@ -33,7 +30,7 @@ impl Default for MarkdownOptions {
             syntax_highlighting_language_classes: true,
             open_links_in_new_tab: true,
             allow_raw_html: true,
-            use_explicit_classes: false,
+            classes: MarkdownClassMap::default(),
         }
     }
 }
@@ -87,13 +84,173 @@ impl MarkdownOptions {
         self
     }
 
-    /// Use explicit Tailwind utility classes on each element instead of relying on prose.
-    /// When `false` (default), relies on Tailwind's `prose` classes for styling.
-    /// When `true`, applies `MarkdownClasses::*` constants directly to elements.
     #[must_use]
-    pub fn with_explicit_classes(mut self, enable: bool) -> Self {
-        self.use_explicit_classes = enable;
+    pub fn with_classes(mut self, classes: MarkdownClassMap) -> Self {
+        self.classes = classes;
         self
+    }
+}
+
+/// CSS classes applied to each rendered element. Empty string = no `class` attribute.
+/// Build your own for any CSS framework, e.g. `MarkdownClassMap { h1: "title".into(), ..MarkdownClassMap::none() }`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MarkdownClassMap {
+    pub wrapper: String,
+    pub h1: String,
+    pub h2: String,
+    pub h3: String,
+    pub h4: String,
+    pub h5: String,
+    pub h6: String,
+    pub paragraph: String,
+    pub blockquote: String,
+    pub inline_code: String,
+    pub code_block: String,
+    pub code_block_code: String,
+    pub ul: String,
+    pub ol: String,
+    pub li: String,
+    pub link: String,
+    pub image: String,
+    pub table: String,
+    pub thead: String,
+    pub tr: String,
+    pub td: String,
+    pub th: String,
+    pub hr: String,
+    pub checkbox: String,
+    pub math_inline: String,
+    pub math_display: String,
+    pub dl: String,
+    pub dt: String,
+    pub dd: String,
+    pub sup: String,
+    pub sub: String,
+    pub em: String,
+    pub strong: String,
+    pub del: String,
+    pub footnote_ref: String,
+    pub footnote_def: String,
+    pub raw_html_block: String,
+    pub inline_html: String,
+}
+
+impl MarkdownClassMap {
+    /// Every field empty — no `class` attributes rendered.
+    #[must_use]
+    pub fn none() -> Self {
+        Self {
+            wrapper: String::new(),
+            h1: String::new(),
+            h2: String::new(),
+            h3: String::new(),
+            h4: String::new(),
+            h5: String::new(),
+            h6: String::new(),
+            paragraph: String::new(),
+            blockquote: String::new(),
+            inline_code: String::new(),
+            code_block: String::new(),
+            code_block_code: String::new(),
+            ul: String::new(),
+            ol: String::new(),
+            li: String::new(),
+            link: String::new(),
+            image: String::new(),
+            table: String::new(),
+            thead: String::new(),
+            tr: String::new(),
+            td: String::new(),
+            th: String::new(),
+            hr: String::new(),
+            checkbox: String::new(),
+            math_inline: String::new(),
+            math_display: String::new(),
+            dl: String::new(),
+            dt: String::new(),
+            dd: String::new(),
+            sup: String::new(),
+            sub: String::new(),
+            em: String::new(),
+            strong: String::new(),
+            del: String::new(),
+            footnote_ref: String::new(),
+            footnote_def: String::new(),
+            raw_html_block: String::new(),
+            inline_html: String::new(),
+        }
+    }
+
+    /// Legacy semantic class names, relying on Tailwind's `prose` classes for most styling.
+    #[must_use]
+    pub fn prose() -> Self {
+        Self {
+            wrapper: get_enhanced_prose_classes().into(),
+            inline_code: "inline-code".into(),
+            hr: "markdown-hr".into(),
+            footnote_ref: "footnote-ref".into(),
+            math_inline: "math math-inline".into(),
+            math_display: "math math-display".into(),
+            blockquote: "markdown-blockquote".into(),
+            code_block: "markdown-code-block".into(),
+            image: "markdown-image".into(),
+            table: "markdown-table".into(),
+            footnote_def: "footnote-definition".into(),
+            raw_html_block: "raw-html-block".into(),
+            inline_html: "raw-html".into(),
+            ..Self::none()
+        }
+    }
+
+    /// Explicit Tailwind utility classes on every element.
+    #[must_use]
+    pub fn tailwind() -> Self {
+        Self {
+            wrapper: MarkdownClasses::CONTENT.into(),
+            h1: MarkdownClasses::H1.into(),
+            h2: MarkdownClasses::H2.into(),
+            h3: MarkdownClasses::H3.into(),
+            h4: MarkdownClasses::H4.into(),
+            h5: MarkdownClasses::H5.into(),
+            h6: MarkdownClasses::H6.into(),
+            paragraph: MarkdownClasses::PARAGRAPH.into(),
+            blockquote: MarkdownClasses::BLOCKQUOTE.into(),
+            inline_code: MarkdownClasses::INLINE_CODE.into(),
+            code_block: MarkdownClasses::CODE_BLOCK.into(),
+            code_block_code: MarkdownClasses::CODE_BLOCK_CODE.into(),
+            ul: MarkdownClasses::UL.into(),
+            ol: MarkdownClasses::OL.into(),
+            li: MarkdownClasses::LI.into(),
+            link: MarkdownClasses::LINK.into(),
+            image: MarkdownClasses::IMAGE.into(),
+            table: MarkdownClasses::TABLE.into(),
+            thead: MarkdownClasses::THEAD.into(),
+            tr: MarkdownClasses::TR.into(),
+            td: MarkdownClasses::TD.into(),
+            th: MarkdownClasses::TH.into(),
+            hr: MarkdownClasses::HR.into(),
+            checkbox: MarkdownClasses::CHECKBOX.into(),
+            math_inline: MarkdownClasses::MATH_INLINE.into(),
+            math_display: MarkdownClasses::MATH_DISPLAY.into(),
+            dl: MarkdownClasses::DL.into(),
+            dt: MarkdownClasses::DT.into(),
+            dd: MarkdownClasses::DD.into(),
+            sup: MarkdownClasses::SUP.into(),
+            sub: MarkdownClasses::SUB.into(),
+            em: MarkdownClasses::EM.into(),
+            strong: MarkdownClasses::STRONG.into(),
+            del: MarkdownClasses::DEL.into(),
+            footnote_ref: MarkdownClasses::FOOTNOTE_REF.into(),
+            footnote_def: MarkdownClasses::FOOTNOTE_DEF.into(),
+            raw_html_block: MarkdownClasses::RAW_HTML_BLOCK.into(),
+            inline_html: MarkdownClasses::INLINE_HTML.into(),
+        }
+    }
+}
+
+impl Default for MarkdownClassMap {
+    fn default() -> Self {
+        Self::prose()
     }
 }
 
@@ -108,8 +265,7 @@ impl MarkdownClasses {
     // Headings
     pub const H1: &'static str =
         "text-3xl font-bold text-gray-900 dark:text-gray-100 mt-6 mb-4 first:mt-0";
-    pub const H2: &'static str =
-        "text-2xl font-semibold text-gray-900 dark:text-gray-100 mt-5 mb-3";
+    pub const H2: &'static str = "text-2xl font-semibold text-gray-900 dark:text-gray-100 mt-5 mb-3";
     pub const H3: &'static str = "text-xl font-semibold text-gray-900 dark:text-gray-100 mt-4 mb-2";
     pub const H4: &'static str = "text-lg font-medium text-gray-900 dark:text-gray-100 mt-3 mb-2";
     pub const H5: &'static str = "text-base font-medium text-gray-900 dark:text-gray-100 mt-3 mb-2";
@@ -139,8 +295,7 @@ impl MarkdownClasses {
     // Tables
     pub const TABLE: &'static str = "min-w-full divide-y divide-gray-200 dark:divide-gray-700 my-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden";
     pub const THEAD: &'static str = "bg-gray-50 dark:bg-gray-800";
-    pub const TR: &'static str =
-        "bg-white dark:bg-gray-900 even:bg-gray-50 dark:even:bg-gray-800/50";
+    pub const TR: &'static str = "bg-white dark:bg-gray-900 even:bg-gray-50 dark:even:bg-gray-800/50";
     pub const TD: &'static str = "px-6 py-4 text-sm text-gray-900 dark:text-gray-100";
     pub const TH: &'static str = "px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider";
 

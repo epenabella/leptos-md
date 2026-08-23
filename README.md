@@ -18,7 +18,7 @@ A lightweight Markdown-to-view component for [Leptos](https://leptos.dev) with b
 - **GitHub Flavored Markdown** - Tables, task lists, strikethrough, footnotes
 - **Code block themes** - Built-in Tailwind themes (GitHub, Monokai, Dark, Light)
 - **External highlighter ready** - Outputs `language-xxx` classes for Prism.js, highlight.js, etc.
-- **Configurable** - Builder pattern for fine-grained control
+- **Configurable** - Builder pattern for fine-grained control; bring any CSS framework via `MarkdownClassMap`
 - **SSR/SSG ready** - Works with server-side rendering and static site generation
 - **Zero JavaScript** - Pure Rust, renders to static HTML
 
@@ -28,7 +28,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-leptos-md = "0.1"
+leptos-md = "0.2"
 leptos = "0.8"
 ```
 
@@ -43,7 +43,7 @@ leptos = "0.8"
 For faster parsing on supported platforms:
 
 ```toml
-leptos-md = { version = "0.1", features = ["simd"] }
+leptos-md = { version = "0.2", features = ["simd"] }
 ```
 
 ## Quick Start
@@ -67,7 +67,7 @@ That's it! The component handles parsing, styling, and dark mode automatically.
 Use `MarkdownOptions` for fine-grained control:
 
 ```rust
-use leptos_md::{Markdown, MarkdownOptions, CodeBlockTheme};
+use leptos_md::{Markdown, MarkdownOptions, MarkdownClassMap, CodeBlockTheme};
 
 #[component]
 fn App() -> impl IntoView {
@@ -77,7 +77,7 @@ fn App() -> impl IntoView {
         .with_language_classes(true)              // Emit language-xxx classes for syntax highlighters
         .with_new_tab_links(true)                 // Open links in new tab
         .with_allow_raw_html(true)                // Render raw HTML in markdown
-        .with_explicit_classes(false);            // Use prose classes (default)
+        .with_classes(MarkdownClassMap::tailwind()); // or ::prose() (default), ::none(), or your own
 
     view! {
         <Markdown
@@ -87,6 +87,25 @@ fn App() -> impl IntoView {
     }
 }
 ```
+
+## Custom Classes (other CSS frameworks)
+
+`MarkdownClassMap` holds the class string for every element (`wrapper`, `h1`..`h6`, `paragraph`, `link`, `table`, `code_block`, ...). Start from a preset and override what you need:
+
+```rust
+use leptos_md::{MarkdownOptions, MarkdownClassMap};
+
+// Bootstrap / Pico style
+let options = MarkdownOptions::new().with_classes(MarkdownClassMap {
+    wrapper: "content".into(),
+    h1: "display-4".into(),
+    table: "table table-striped".into(),
+    code_block: "p-3 bg-light".into(),
+    ..MarkdownClassMap::none()
+});
+```
+
+Presets: `MarkdownClassMap::prose()` (default, Tailwind `prose` wrapper + semantic `markdown-*` names), `::tailwind()` (utility classes on every element), `::none()` (no classes). The `MarkdownClasses::*` consts (e.g. `MarkdownClasses::H1`) expose the Tailwind strings if you want to mix them in.
 
 ## Supported Markdown Features
 
@@ -193,7 +212,7 @@ let options = MarkdownOptions::new()
 | `syntax_highlighting_language_classes` | `bool` | `true` | Add `language-xxx` classes for external highlighters |
 | `open_links_in_new_tab` | `bool` | `true` | Add `target="_blank"` to links |
 | `allow_raw_html` | `bool` | `true` | Render raw HTML in markdown |
-| `use_explicit_classes` | `bool` | `false` | Use explicit Tailwind classes instead of prose |
+| `classes` | `MarkdownClassMap` | `prose()` | Per-element class map (see Custom Classes) |
 
 All options use a builder pattern with `#[must_use]` for safety:
 
@@ -204,19 +223,17 @@ MarkdownOptions::new()
     .with_language_classes(true)
     .with_new_tab_links(false)
     .with_allow_raw_html(true)
-    .with_explicit_classes(false)
+    .with_classes(MarkdownClassMap::prose())
 ```
 
-### Explicit Classes Mode
+### Tailwind Without `@tailwindcss/typography`
 
-By default, `leptos-md` relies on Tailwind's `prose` classes for styling. If you're not using the `@tailwindcss/typography` plugin or want full control over each element's styling, enable explicit classes:
+By default the wrapper gets Tailwind `prose` classes. If you are not using the typography plugin, use the `tailwind()` preset to put utility classes on every element:
 
 ```rust
 let options = MarkdownOptions::new()
-    .with_explicit_classes(true);  // Apply MarkdownClasses::* directly
+    .with_classes(MarkdownClassMap::tailwind());
 ```
-
-When enabled, elements receive explicit Tailwind utility classes from `MarkdownClasses` constants (e.g., `MarkdownClasses::H1`, `MarkdownClasses::PARAGRAPH`). You can customize these by overriding the CSS or using Tailwind's `@apply` directive.
 
 ## Why leptos-md?
 

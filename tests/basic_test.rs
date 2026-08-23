@@ -1,8 +1,9 @@
 #[cfg(test)]
 mod tests {
+    use leptos::prelude::*;
     use leptos_md::{
-        render_markdown_string, render_markdown_with_options, CodeBlockTheme, MarkdownClasses,
-        MarkdownOptions,
+        render_markdown_string, render_markdown_with_options, CodeBlockTheme, MarkdownClassMap,
+        MarkdownClasses, MarkdownOptions,
     };
 
     #[test]
@@ -27,14 +28,14 @@ mod tests {
             .with_language_classes(false)
             .with_new_tab_links(false)
             .with_allow_raw_html(false)
-            .with_explicit_classes(true);
+            .with_classes(MarkdownClassMap::tailwind());
 
         assert!(!options.enable_gfm);
         assert_eq!(options.code_theme, Some(CodeBlockTheme::Dark));
         assert!(!options.syntax_highlighting_language_classes);
         assert!(!options.open_links_in_new_tab);
         assert!(!options.allow_raw_html);
-        assert!(options.use_explicit_classes);
+        assert_eq!(options.classes, MarkdownClassMap::tailwind());
     }
 
     #[test]
@@ -56,10 +57,6 @@ mod tests {
         assert!(
             options.allow_raw_html,
             "Raw HTML should be allowed by default"
-        );
-        assert!(
-            !options.use_explicit_classes,
-            "Explicit classes should be disabled by default"
         );
     }
 
@@ -159,7 +156,7 @@ Term 2
 
     #[test]
     fn test_tailwind_classes_new_constants() {
-        // Test the new constants added for explicit classes mode
+        // Test the per-element constants
         assert!(
             MarkdownClasses::EM.contains("italic"),
             "EM should have italic class"
@@ -172,18 +169,42 @@ Term 2
             MarkdownClasses::DEL.contains("line-through"),
             "DEL should have line-through class"
         );
-        assert!(!MarkdownClasses::DL.is_empty(), "DL should be defined");
-        assert!(!MarkdownClasses::DT.is_empty(), "DT should be defined");
-        assert!(!MarkdownClasses::DD.is_empty(), "DD should be defined");
-        assert!(!MarkdownClasses::SUP.is_empty(), "SUP should be defined");
-        assert!(!MarkdownClasses::SUB.is_empty(), "SUB should be defined");
+        assert!(
+            !MarkdownClasses::DL.is_empty(),
+            "DL should be defined"
+        );
+        assert!(
+            !MarkdownClasses::DT.is_empty(),
+            "DT should be defined"
+        );
+        assert!(
+            !MarkdownClasses::DD.is_empty(),
+            "DD should be defined"
+        );
+        assert!(
+            !MarkdownClasses::SUP.is_empty(),
+            "SUP should be defined"
+        );
+        assert!(
+            !MarkdownClasses::SUB.is_empty(),
+            "SUB should be defined"
+        );
         assert!(
             !MarkdownClasses::THEAD.is_empty(),
             "THEAD should be defined"
         );
-        assert!(!MarkdownClasses::TR.is_empty(), "TR should be defined");
-        assert!(!MarkdownClasses::TD.is_empty(), "TD should be defined");
-        assert!(!MarkdownClasses::TH.is_empty(), "TH should be defined");
+        assert!(
+            !MarkdownClasses::TR.is_empty(),
+            "TR should be defined"
+        );
+        assert!(
+            !MarkdownClasses::TD.is_empty(),
+            "TD should be defined"
+        );
+        assert!(
+            !MarkdownClasses::TH.is_empty(),
+            "TH should be defined"
+        );
     }
 
     #[test]
@@ -213,13 +234,13 @@ Term 2
     }
 
     #[test]
-    fn test_render_with_explicit_classes() {
+    fn test_render_with_tailwind_classes() {
         let markdown = "# Hello\n\nWorld";
-        let options = MarkdownOptions::new().with_explicit_classes(true);
+        let options = MarkdownOptions::new().with_classes(MarkdownClassMap::tailwind());
         let result = render_markdown_with_options(markdown, options);
         assert!(
             result.is_ok(),
-            "Rendering with explicit classes should succeed"
+            "Rendering with tailwind classes should succeed"
         );
     }
 
@@ -236,5 +257,39 @@ Term 2
             result.is_ok(),
             "Rendering without code theme should succeed"
         );
+    }
+
+    #[test]
+    fn test_custom_class_map_html() {
+        let options = MarkdownOptions::new().with_classes(MarkdownClassMap {
+            h1: "title".into(),
+            link: "lnk".into(),
+            ..MarkdownClassMap::none()
+        });
+        let html = render_markdown_with_options("# Title\n\nA [link](https://x.y)", options)
+            .unwrap()
+            .to_html();
+        assert!(html.contains("class=\"title\""), "{html}");
+        assert!(html.contains("class=\"lnk\""), "{html}");
+        assert!(!html.contains("prose"), "{html}");
+    }
+
+    #[test]
+    fn test_table_header_cells() {
+        let html = render_markdown_string("| A | B |\n|---|---|\n| 1 | 2 |")
+            .unwrap()
+            .to_html();
+        assert!(html.contains("<th"), "{html}");
+    }
+
+    #[test]
+    fn test_default_is_prose() {
+        assert_eq!(MarkdownClassMap::default(), MarkdownClassMap::prose());
+        assert!(MarkdownClassMap::prose().wrapper.contains("prose"));
+    }
+
+    #[test]
+    fn test_none_is_empty() {
+        assert!(MarkdownClassMap::none().h1.is_empty());
     }
 }
