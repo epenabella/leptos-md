@@ -66,8 +66,7 @@ That's all folks!
         .with_code_theme(CodeBlockTheme::GitHub)
         .with_language_classes(true)
         .with_new_tab_links(true)
-        .with_allow_raw_html(true)
-        .with_explicit_classes(false);
+        .with_allow_raw_html(true);
 
     view! {
         <div class="min-h-screen bg-white dark:bg-gray-900">
